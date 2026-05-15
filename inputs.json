@@ -1,0 +1,22 @@
+[
+  {
+    "id": "msg_001",
+    "raw_message": "Hi ArcVault Support, we're seeing a critical login issue affecting several of our users since this morning. When they attempt to authenticate via SSO, they receive error code AUTH-5032 and are immediately redirected back to the login page without any explanation. This is happening for roughly 15 out of our 40 users. We're on the Enterprise plan and this is severely impacting our team's ability to work. Please advise ASAP. — Raj Patel, IT Admin @ Meridian Analytics"
+  },
+  {
+    "id": "msg_002",
+    "raw_message": "Hello, I'm reaching out on behalf of our operations team at Crestline Logistics. We manage a large volume of archived records in ArcVault and currently have to export them one at a time, which is extremely time-consuming. It would be a huge productivity win if we could select multiple records and export them all as a single CSV file. Ideally we'd want filtering options too — by date range, tag, or record type. Is this something on the roadmap? Happy to join a beta if available. Thanks, Dana Holloway, Operations Lead"
+  },
+  {
+    "id": "msg_003",
+    "raw_message": "To Whom It May Concern, I'm writing about an unexpected charge that appeared on our May invoice. We were billed $1,840 under the line item 'Overage — Storage Tier 2', but according to our contract signed in January we have a fixed storage allotment through Q3 with no overage fees. I've attached our contract for reference. We'd like this charge reversed immediately and an explanation of how this billing error occurred. Please escalate to your billing team. — Christine Voss, CFO, Nordvik Group"
+  },
+  {
+    "id": "msg_004",
+    "raw_message": "Hey support team, quick technical question — we're building an internal integration that hits the ArcVault REST API to pull records on a schedule. We've noticed that under heavy load we occasionally get 429 responses. Can you clarify what the exact rate limits are per API key? Specifically: requests per minute, burst limit, and whether limits are applied per endpoint or globally. Also wondering if there's a way to request a higher limit for our enterprise tier. Thanks in advance, Marcus Webb, Backend Engineer @ Talus Systems"
+  },
+  {
+    "id": "msg_005",
+    "raw_message": "URGENT — The ArcVault platform is completely down for all users at our organization as of 09:14 AM EST. Nobody can log in, the dashboard returns a 503 error, and our automated archive jobs have all failed. This is a full outage affecting our entire team of 200+ users. We are a financial services firm and this is causing serious compliance risk as we cannot access required records. We need an immediate status update and ETA for resolution. Escalate this to your highest support tier NOW. — YvonneCastillo, CTO, Fortress Capital Management"
+  }
+]

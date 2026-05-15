@@ -1,0 +1,11 @@
+{
+  "name": "arcvault-triage",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node pipeline.js"
+  },
+  "dependencies": {
+    "openai": "^4.0.0"
+  }
+}
