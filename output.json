@@ -1,0 +1,121 @@
+[
+  {
+    "id": "msg_001",
+    "source": "Email",
+    "raw_message": "Hi, I tried logging in this morning and keep getting a 403 error. My account is arcvault.io/user/jsmith. This started after your update last Tuesday.",
+    "category": "Bug Report",
+    "confidence": 0.9,
+    "priority": "Medium",
+    "core_issue": "The user is experiencing a 403 error when trying to log in after the update last Tuesday.",
+    "urgency_signal": "single user blocked",
+    "summary": "The user jsmith from arcvault.io is experiencing a 403 error when trying to log in, which started after the update last Tuesday. The issue is preventing them from accessing their account. The error code 403 is a key detail that the team needs to investigate.",
+    "queue": "Engineering",
+    "entities": {
+      "company": "arcvault.io",
+      "error_codes": [
+        "403"
+      ],
+      "other": {},
+      "product": null,
+      "user": "jsmith"
+    },
+    "escalate": false,
+    "escalation_reasons": []
+  },
+  {
+    "id": "msg_002",
+    "source": "Web Form",
+    "raw_message": "We'd love to see a bulk export feature for our audit logs. We're a compliance-heavy org and this would save us hours every month.",
+    "category": "Feature Request",
+    "confidence": 0.9,
+    "priority": "Low",
+    "core_issue": "The customer is requesting a bulk export feature for audit logs to reduce manual work.",
+    "urgency_signal": "single user inconvenience",
+    "summary": "The customer is requesting a bulk export feature for audit logs to reduce manual work, as a compliance-heavy organization they would greatly benefit from this feature. This would save them hours of work every month. The customer is asking for this feature to improve their workflow.",
+    "queue": "Product",
+    "entities": {
+      "company": null,
+      "error_codes": [],
+      "other": {},
+      "product": null,
+      "user": null
+    },
+    "escalate": false,
+    "escalation_reasons": []
+  },
+  {
+    "id": "msg_003",
+    "source": "Support Portal",
+    "raw_message": "Invoice #8821 shows a charge of $1,240 but our contract rate is $980/month. Can someone look into this?",
+    "category": "Billing Issue",
+    "confidence": 0.9,
+    "priority": "Medium",
+    "core_issue": "Discrepancy between invoiced amount and contract rate",
+    "urgency_signal": "invoice discrepancy",
+    "summary": "The customer is reporting a billing discrepancy where their invoice #8821 shows a charge of $1,240, but their contract rate is $980/month. The team should investigate this matter to resolve the issue. The customer is requesting someone to look into this. The contract rate and invoiced amount need to be reconciled.",
+    "queue": "Billing",
+    "entities": {
+      "company": null,
+      "error_codes": [],
+      "other": {
+        "contract_rate": "$980/month",
+        "invoice_number": "8821",
+        "invoiced_amount": "$1,240"
+      },
+      "product": null,
+      "user": null
+    },
+    "escalate": false,
+    "escalation_reasons": []
+  },
+  {
+    "id": "msg_004",
+    "source": "Email",
+    "raw_message": "I'm not sure if this is the right place to ask, but is there a way to set up SSO with Okta? We're evaluating switching our auth provider.",
+    "category": "Technical Question",
+    "confidence": 0.9,
+    "priority": "Low",
+    "core_issue": "The customer is inquiring about setting up SSO with Okta for authentication.",
+    "urgency_signal": "single user inquiry",
+    "summary": "The customer is evaluating a switch from their current authentication provider to Okta and is seeking guidance on setting up SSO. They are in the process of assessing the feasibility of this change. The customer requires assistance with understanding the technical requirements for integrating Okta with their existing system.",
+    "queue": "Engineering",
+    "entities": {
+      "company": null,
+      "error_codes": [],
+      "other": {
+        "auth_provider": "Okta"
+      },
+      "product": null,
+      "user": null
+    },
+    "escalate": false,
+    "escalation_reasons": []
+  },
+  {
+    "id": "msg_005",
+    "source": "Web Form",
+    "raw_message": "Your dashboard stopped loading for us around 2pm EST. Checked our end — it's definitely on yours. Multiple users affected.",
+    "category": "Incident/Outage",
+    "confidence": 0.9,
+    "priority": "High",
+    "core_issue": "The customer's dashboard stopped loading at 2pm EST, affecting multiple users.",
+    "urgency_signal": "multiple users blocked",
+    "summary": "Multiple users at an unnamed company are affected by the dashboard being unavailable since 2pm EST. The issue has been checked on the customer's end and appears to be on our side. The team needs to act quickly to resolve this incident.",
+    "queue": "IT/Security",
+    "entities": {
+      "company": null,
+      "error_codes": [],
+      "other": {
+        "affected_users": "multiple",
+        "time": "2pm EST"
+      },
+      "product": "dashboard",
+      "user": null
+    },
+    "escalate": true,
+    "escalation_reasons": [
+      "keyword:stopped_loading",
+      "keyword:multiple_users_affected"
+    ]
+  }
+]

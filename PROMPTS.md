@@ -18,10 +18,15 @@ Classification categories — choose exactly one:
 
 Confidence score: a float between 0.0 and 1.0 reflecting how certain you are about the category.
 
+Priority:
+- High: service is down, data loss risk, compliance impact, or many users blocked
+- Medium: degraded functionality, billing dispute, or moderate business impact
+- Low: how-to questions, feature requests, or single-user inconveniences
+
 Entities to extract:
-- company: customer's company or organization name (null if not mentioned)
-- product: specific product or service referenced (null if not mentioned)
-- user: name of the person who sent the message (null if not mentioned)
+- company: customer's company or organization name (empty string if not mentioned)
+- product: specific product or service referenced (empty string if not mentioned)
+- user: name of the person who sent the message (empty string if not mentioned)
 - error_codes: array of any error codes, HTTP status codes, or error identifiers (empty array if none)
 - other: object with any other notable entities such as plan names, dollar amounts, timestamps, or affected user counts
 ```
@@ -45,14 +50,18 @@ The `other` entity field is described with examples ("plan names, dollar amounts
   "type": "function",
   "function": {
     "name": "classify_and_enrich",
-    "description": "Classify a B2B customer support message into a category and extract named entities from it.",
+    "description": "Classify a B2B customer support message into a category, extract named entities, and produce a human-readable summary for the receiving team.",
     "parameters": {
       "category": "The classification category of the support message.",
       "confidence": "Confidence score between 0.0 and 1.0 for the classification.",
+      "priority": "Urgency priority: High, Medium, or Low.",
+      "core_issue": "One sentence describing the specific problem or request the customer is raising.",
+      "urgency_signal": "A short phrase (5 words or fewer) capturing the urgency level.",
+      "summary": "2-3 sentence human-readable summary for the team receiving this ticket.",
       "entities": {
-        "company": "Customer company or organization name, or null.",
-        "product": "Product or service name referenced, or null.",
-        "user": "Name of the person who sent the message, or null.",
+        "company": "Customer company or organization name, or empty string if not mentioned.",
+        "product": "Product or service name referenced, or empty string if not mentioned.",
+        "user": "Name of the person who sent the message, or empty string if not mentioned.",
         "error_codes": "Error codes, HTTP status codes, or error identifiers mentioned.",
         "other": "Any other notable extracted entities such as plan names, amounts, or dates."
       }
@@ -69,7 +78,7 @@ First, forcing tool use via `tool_choice: {type: "function", function: {name: "c
 
 Second, the `category` field uses an `enum` constraint. This eliminates an entire class of output failures — the model cannot invent a sixth category or return a typo variant. The enum values in the tool definition are the single source of truth and intentionally mirror the routing table keys in `ROUTING` exactly, so any mismatch would cause a silent routing failure.
 
-Third, nullable fields (`company`, `product`, `user`) explicitly declare `type: ["string", "null"]` and say "or null" in their descriptions. Without the explicit null type and the prose instruction, models tend to hallucinate placeholder values ("Unknown", "N/A") rather than returning `null`, which pollutes downstream entity data.
+Third, optional entity fields (`company`, `product`, `user`) are typed as `string` with instructions to return an empty string when the value is absent. The original design used `type: ["string", "null"]`, but Groq rejected that union type at runtime — a known gap in their tool-calling implementation versus the JSON Schema spec. The workaround is to declare `type: "string"` and coerce empty strings to `null` in application code after parsing (`parsed.entities.company || null`). The downstream output still uses `null` for missing values; the schema compromise is isolated to the tool definition.
 
 ---
 

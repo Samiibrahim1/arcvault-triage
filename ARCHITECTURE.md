@@ -13,12 +13,13 @@ inputs.json
 └──────┬──────┘
        │
        ▼
-┌─────────────────────────────────────────┐
-│         Classify + Enrich (LLM)         │
-│  model: llama-3.3-70b-versatile @ Groq  │
-│  tool_choice: classify_and_enrich       │
-│  → category, confidence, entities       │
-└──────┬──────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                  Classify + Enrich (LLM)                    │
+│  model: llama-3.3-70b-versatile @ Groq                      │
+│  tool_choice: classify_and_enrich                           │
+│  → category, confidence, priority, core_issue,              │
+│     urgency_signal, summary, entities                       │
+└──────┬──────────────────────────────────────────────────────┘
        │
        ▼
 ┌─────────────┐
@@ -54,6 +55,8 @@ Routing is a pure lookup table defined in `ROUTING` at the top of `pipeline.js`:
 
 The mapping is intentional: routing lives in application code, not inside the LLM prompt. This means routing rules are versioned in git, testable without an API call, and changeable without touching the prompt. If the model returns a category not in the table, `ROUTING[category]` returns `undefined`, which surfaces immediately as a visible gap in the output rather than silently routing to a wrong queue.
 
+**Low-confidence fallback.** If `confidence < 0.70`, the record bypasses the category-based routing table entirely and is assigned to a dedicated `"Review"` queue. This ensures that uncertain classifications are never silently sent to a downstream team — they land in a human review queue regardless of which category the model chose.
+
 ---
 
 ## Escalation Logic
@@ -66,12 +69,18 @@ escalate = (confidence < 0.70) OR (message matches any keyword pattern)
 
 **Rule 1 — Low confidence.** If the model's self-reported confidence is below 0.70, the record is flagged for human review. This catches genuinely ambiguous messages where the model is uncertain, regardless of which category it chose.
 
-**Rule 2 — Keyword match.** Three regex patterns are checked against the raw message text (case-insensitive):
+**Rule 2 — Keyword match.** Nine regex patterns are checked against the raw message text (case-insensitive):
 - `/outage/i` → `keyword:outage`
 - `/down for all users/i` → `keyword:down_for_all_users`
 - `/billing error/i` → `keyword:billing_error`
+- `/stopped loading/i` → `keyword:stopped_loading`
+- `/multiple users affected/i` → `keyword:multiple_users_affected`
+- `/not loading/i` → `keyword:not_loading`
+- `/can'?t access/i` → `keyword:cant_access`
+- `/cannot access/i` → `keyword:cannot_access`
+- `/completely down/i` → `keyword:completely_down`
 
-These patterns target language that signals high business impact independently of how the model classified the message. A billing dispute that never trips the low-confidence rule but contains the phrase "billing error" should still be reviewed by a human.
+These patterns target language that signals high business impact independently of how the model classified the message. A billing dispute that never trips the low-confidence rule but contains the phrase "billing error" should still be reviewed by a human. The broader set of patterns catches incident language that does not use the word "outage" — a dashboard that "stopped loading" for "multiple users" is operationally equivalent to an outage even if the sender does not use that word.
 
 Escalation reasons are additive — multiple rules can fire on the same record, and all triggered reasons are recorded in `escalation_reasons`. This gives the human reviewer context on why the record was flagged, not just that it was.
 
@@ -92,6 +101,20 @@ Like routing, escalation logic lives in application code and not in the prompt. 
 **Secrets management.** `GROQ_API_KEY` moves from an env var passed at the CLI to a secrets manager (AWS Secrets Manager, GCP Secret Manager, Vault). Rotation is automated, and the key is never in shell history or process listings.
 
 **Retry and fallback.** The API call in `processMessage` gets exponential backoff with jitter for transient errors, and a circuit breaker that stops hammering the API if the error rate crosses a threshold. A fallback model (smaller, cheaper) can be used for non-urgent messages when the primary model is degraded.
+
+---
+
+## Model Choice
+
+The pipeline uses `llama-3.3-70b-versatile` served via Groq. Three factors drove this choice.
+
+**Cost.** Groq's free tier is generous enough to run this pipeline repeatedly during development without incurring charges. For a prototype or internal tool with moderate volume, the free tier is effectively unlimited for practical purposes.
+
+**Speed.** Groq runs inference on custom LPU hardware rather than GPUs, which produces noticeably lower latency per call than standard cloud inference endpoints. For a sequential pipeline processing messages one at a time, this compounds across every record.
+
+**Integration simplicity.** Groq exposes an OpenAI-compatible API — same wire format, same SDK, same tool-calling contract. Switching from the Anthropic SDK to Groq required changing the client initialization and response parsing, but none of the tool schema, routing logic, or escalation rules needed to change.
+
+**Tradeoff versus paid models.** The main cost of using a free open-weight model is reliability of structured output. GPT-4o and Claude Sonnet have stronger instruction-following on complex or ambiguous tool schemas and are less likely to produce malformed JSON or ignore enum constraints under edge-case inputs. In this pipeline, that gap showed up once: Groq rejected `type: ["string", "null"]` in the tool schema (a valid JSON Schema construct) and required a workaround. At production scale, a paid model would reduce schema-related failures, produce more consistently calibrated confidence scores, and handle trickier support messages — ambiguous tone, mixed languages, very long messages — with higher accuracy. The right inflection point is when classification errors start costing more than the API bill.
 
 ---
 
