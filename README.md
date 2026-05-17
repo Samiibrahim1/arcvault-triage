@@ -10,7 +10,8 @@ Agentic workflow that ingests unstructured B2B support messages, classifies and 
 ## Setup
 
 ```bash
-# 1. Clone or download the project
+# 1. Clone the repo
+git clone https://github.com/Samiibrahim1/arcvault-triage.git
 cd arcvault-triage
 
 # 2. Install dependencies
@@ -26,7 +27,7 @@ export GROQ_API_KEY=your_key_here
 npm start
 ```
 
-The pipeline reads from `inputs.json`, processes each message, and writes results to `output.json`.
+Reads from `inputs.json`, processes each message, and writes results to `output.json`.
 
 Example terminal output:
 
@@ -40,6 +41,34 @@ Processing 5 messages...
 ✓ msg_005 → Incident/Outage (0.90) [IT/Security] [High]  ⚠ keyword:stopped_loading, keyword:multiple_users_affected
 
 Wrote 5 records to output.json
+```
+
+## Other Commands
+
+```bash
+npm test        # Run unit tests (escalation + routing logic)
+npm run lint    # Lint src/ with ESLint
+npm run format  # Format all files with Prettier
+```
+
+## Project Structure
+
+```
+arcvault-triage/
+├── src/
+│   ├── index.js            # Main loop — reads inputs, writes output
+│   ├── process-message.js  # LLM call + result assembly
+│   ├── routing.js          # ROUTING table + resolveQueue()
+│   ├── escalation.js       # Keyword list + applyEscalationRules()
+│   ├── schema.js           # Tool schema (CLASSIFY_TOOL)
+│   └── prompts.js          # System prompt (SYSTEM_PROMPT)
+├── test/
+│   ├── escalation.test.js  # Unit tests for escalation rules
+│   └── routing.test.js     # Unit tests for routing logic
+├── inputs.json             # Sample inbound messages
+├── output.json             # Processed results
+├── eslint.config.js
+└── .prettierrc
 ```
 
 ## Input Format
@@ -82,4 +111,4 @@ A record is escalated (`escalate: true`) when confidence is below 0.70 or the me
 
 ## Model
 
-`llama-3.3-70b-versatile` via Groq. Change the `model` parameter in `pipeline.js` to switch models. Groq exposes an OpenAI-compatible API so any Groq-hosted model works as a drop-in replacement.
+`llama-3.3-70b-versatile` via Groq. Change the `model` parameter in `src/process-message.js` to switch models. Groq exposes an OpenAI-compatible API so any Groq-hosted model works as a drop-in replacement.
