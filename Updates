@@ -1,0 +1,21 @@
+Split pipeline.js into src/. One 225-line file is fine functionally but reads as a script. Modularize:
+    - src/routing.js — ROUTING table + lookup
+    - src/escalation.js — keyword list + applyEscalationRules
+    - src/schema.js — tool schema
+    - src/prompts.js — system prompt
+    - src/process-message.js — the LLM call
+    - src/index.js — main loop
+  Six small files reads as "engineered" where one big file reads as "draft."
+  7. ESLint + Prettier configs (eslint.config.js, .prettierrc). npm run lint, npm run format. Standard tooling presence is a strong professional tell.
+  8. JSDoc on exported functions. Type signatures via @param/@returns comments, then add "types": "./src/index.d.ts" if you want to go further with tsc --declaration on
+  JSDoc. Cheaper than TypeScript, looks the same to a reviewer.
+
+
+- Add Test files 
+
+
+- ESLint + Prettier configs (eslint.config.js, .prettierrc). npm run lint, npm run format. Standard tooling presence is
+  a strong professional tell. Node's built-in test runner (node --test) for test/escalation.test.js and test/routing.test.js. Zero new deps, npm test actually does something, and CI has something
+
+
+- Extra step, publish online on a free server (.github/workflows/ci.yml)
