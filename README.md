@@ -53,32 +53,77 @@ npm run lint    # Lint src/ with ESLint
 npm run format  # Format all files with Prettier
 ```
 
-## API Server
+## Live API
 
-The pipeline also runs as an HTTP API via Express.
+The pipeline is deployed at **https://arcvault-triage.onrender.com**
 
+No setup or API key needed — just run the curl commands below.
+
+---
+
+### Health check
 ```bash
-npm run serve
+curl https://arcvault-triage.onrender.com/
+```
+```json
+{ "status": "ok", "service": "arcvault-triage" }
 ```
 
-**Health check:**
-```
-GET /
-→ { "status": "ok", "service": "arcvault-triage" }
+---
+
+### Triage a single message
+```bash
+curl -X POST https://arcvault-triage.onrender.com/triage \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "msg_001",
+    "source": "Email",
+    "raw_message": "I keep getting a 403 error when logging in since your last update."
+  }'
 ```
 
-**Triage a message:**
-```
-POST /triage
-Content-Type: application/json
-
+**Response:**
+```json
 {
   "id": "msg_001",
   "source": "Email",
-  "raw_message": "Your support message here."
+  "raw_message": "I keep getting a 403 error when logging in since your last update.",
+  "category": "Bug Report",
+  "confidence": 0.9,
+  "priority": "Medium",
+  "core_issue": "The customer is experiencing a 403 error when logging in after the last update.",
+  "urgency_signal": "single user blocked",
+  "summary": "A user is unable to log in due to a 403 error that started after the latest update...",
+  "queue": "Engineering",
+  "entities": { "company": null, "product": null, "user": null, "error_codes": ["403"], "other": {} },
+  "escalate": false,
+  "escalation_reasons": []
 }
 ```
-Returns the fully enriched and routed JSON record.
+
+---
+
+### Triage all 5 sample messages at once
+```bash
+curl -X POST https://arcvault-triage.onrender.com/triage/batch \
+  -H "Content-Type: application/json" \
+  -d '[
+    {"id":"msg_001","source":"Email","raw_message":"Hi, I tried logging in this morning and keep getting a 403 error. My account is arcvault.io/user/jsmith. This started after your update last Tuesday."},
+    {"id":"msg_002","source":"Web Form","raw_message":"We would love to see a bulk export feature for our audit logs. We are a compliance-heavy org and this would save us hours every month."},
+    {"id":"msg_003","source":"Support Portal","raw_message":"Invoice #8821 shows a charge of $1,240 but our contract rate is $980/month. Can someone look into this?"},
+    {"id":"msg_004","source":"Email","raw_message":"Is there a way to set up SSO with Okta? We are evaluating switching our auth provider."},
+    {"id":"msg_005","source":"Web Form","raw_message":"Your dashboard stopped loading for us around 2pm EST. Checked our end it is definitely on yours. Multiple users affected."}
+  ]'
+```
+
+Returns an array of all 5 enriched and routed records.
+
+---
+
+### Run the API server locally
+```bash
+npm start
+```
 
 ## Deploying to Render
 
