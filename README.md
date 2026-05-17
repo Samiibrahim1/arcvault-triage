@@ -21,10 +21,10 @@ npm install
 export GROQ_API_KEY=your_key_here
 ```
 
-## Running the Pipeline
+## Running the Pipeline (batch mode)
 
 ```bash
-npm start
+npm run batch
 ```
 
 Reads from `inputs.json`, processes each message, and writes results to `output.json`.
@@ -46,7 +46,8 @@ Wrote 5 records to output.json
 ## Other Commands
 
 ```bash
-npm run serve   # Start the Express API server (for deployment)
+npm start       # Start the Express API server (for deployment)
+npm run batch   # Batch mode — process inputs.json → output.json
 npm test        # Run unit tests (escalation + routing logic)
 npm run lint    # Lint src/ with ESLint
 npm run format  # Format all files with Prettier

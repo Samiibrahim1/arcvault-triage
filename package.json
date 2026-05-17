@@ -6,8 +6,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "serve": "node src/server.js",
+    "start": "node src/server.js",
+    "batch": "node src/index.js",
     "test": "node --test test/escalation.test.js test/routing.test.js",
     "lint": "eslint src/",
     "format": "prettier --write ."
