@@ -46,27 +46,68 @@ Wrote 5 records to output.json
 ## Other Commands
 
 ```bash
+npm run serve   # Start the Express API server (for deployment)
 npm test        # Run unit tests (escalation + routing logic)
 npm run lint    # Lint src/ with ESLint
 npm run format  # Format all files with Prettier
 ```
+
+## API Server
+
+The pipeline also runs as an HTTP API via Express.
+
+```bash
+npm run serve
+```
+
+**Health check:**
+```
+GET /
+→ { "status": "ok", "service": "arcvault-triage" }
+```
+
+**Triage a message:**
+```
+POST /triage
+Content-Type: application/json
+
+{
+  "id": "msg_001",
+  "source": "Email",
+  "raw_message": "Your support message here."
+}
+```
+Returns the fully enriched and routed JSON record.
+
+## Deploying to Render
+
+1. Sign up at [render.com](https://render.com)
+2. Click **New Web Service** → connect your GitHub repo
+3. Render auto-detects `render.yaml` — no manual config needed
+4. Add `GROQ_API_KEY` as an environment variable in the Render dashboard
+5. Deploy
 
 ## Project Structure
 
 ```
 arcvault-triage/
 ├── src/
-│   ├── index.js            # Main loop — reads inputs, writes output
+│   ├── index.js            # Batch script — reads inputs.json, writes output.json
+│   ├── server.js           # Express API server
 │   ├── process-message.js  # LLM call + result assembly
 │   ├── routing.js          # ROUTING table + resolveQueue()
 │   ├── escalation.js       # Keyword list + applyEscalationRules()
 │   ├── schema.js           # Tool schema (CLASSIFY_TOOL)
 │   └── prompts.js          # System prompt (SYSTEM_PROMPT)
+├── docs/
+│   ├── ARCHITECTURE.md     # System design and architecture write-up
+│   └── PROMPTS.md          # Prompt documentation and design decisions
 ├── test/
 │   ├── escalation.test.js  # Unit tests for escalation rules
 │   └── routing.test.js     # Unit tests for routing logic
 ├── inputs.json             # Sample inbound messages
 ├── output.json             # Processed results
+├── render.yaml             # Render deployment config
 ├── eslint.config.js
 └── .prettierrc
 ```

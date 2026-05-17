@@ -7,11 +7,13 @@
   },
   "scripts": {
     "start": "node src/index.js",
+    "serve": "node src/server.js",
     "test": "node --test test/escalation.test.js test/routing.test.js",
     "lint": "eslint src/",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "express": "^5.2.1",
     "openai": "^4.0.0"
   },
   "devDependencies": {
